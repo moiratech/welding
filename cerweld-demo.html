@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cerweld – Ammattihitsaus & Tarkastuspalvelut</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black:    #080A09;
+    --forge:    #0D1110;
+    --steel:    #161C1A;
+    --amber:    #E8760A;
+    --amber-dim:#A0520A;
+    --spark:    #FFB347;
+    --offwhite: #F0EBE3;
+    --mid:      #8A9590;
+    --dim:      #4A5450;
+    --border:   #1E2825;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--offwhite);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px;
+    height: 68px;
+    background: rgba(8,10,9,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px; font-weight: 800; letter-spacing: 0.08em;
+    color: var(--offwhite); text-decoration: none;
+  }
+  .nav-logo span { color: var(--amber); }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a {
+    color: var(--mid); text-decoration: none; font-size: 13px;
+    font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--offwhite); }
+  .nav-cta {
+    background: var(--amber); color: var(--black);
+    padding: 10px 24px; font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--spark); }
+  .nav-mobile-toggle { display: none; background: none; border: none; color: var(--offwhite); font-size: 24px; cursor: pointer; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid; grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 100px 48px 60px;
+    position: relative; overflow: hidden;
+  }
+
+  /* Forge glow — the signature element */
+  .hero::before {
+    content: '';
+    position: absolute; bottom: -20%; right: -5%;
+    width: 600px; height: 600px;
+    background: radial-gradient(ellipse, rgba(232,118,10,0.18) 0%, rgba(232,118,10,0.06) 40%, transparent 70%);
+    animation: breathe 4s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; top: 30%; right: 42%;
+    width: 1px; height: 60%;
+    background: linear-gradient(to bottom, transparent, var(--border), transparent);
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50%       { opacity: 1;   transform: scale(1.08); }
+  }
+
+  .hero-content { position: relative; z-index: 1; padding-right: 60px; }
+
+  .hero-eyebrow {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--amber);
+    margin-bottom: 24px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .hero-eyebrow::before {
+    content: ''; display: block;
+    width: 32px; height: 1px; background: var(--amber);
+  }
+
+  .hero-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(56px, 7vw, 88px);
+    font-weight: 900; line-height: 0.95;
+    letter-spacing: -0.01em;
+    color: var(--offwhite);
+    margin-bottom: 28px;
+  }
+  .hero-title em {
+    font-style: normal; color: var(--amber);
+    display: block;
+  }
+
+  .hero-sub {
+    font-size: 17px; font-weight: 300; color: var(--mid);
+    max-width: 420px; line-height: 1.7; margin-bottom: 44px;
+  }
+
+  .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--amber); color: var(--black);
+    padding: 16px 36px; font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--spark); transform: translateY(-1px); }
+  .btn-ghost {
+    border: 1px solid var(--dim); color: var(--offwhite);
+    padding: 16px 36px; font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; text-decoration: none;
+    transition: border-color 0.2s, color 0.2s;
+    display: inline-block;
+  }
+  .btn-ghost:hover { border-color: var(--amber); color: var(--amber); }
+
+  /* Hero right — stat panel */
+  .hero-panel {
+    position: relative; z-index: 1;
+    border: 1px solid var(--border);
+    background: var(--forge);
+    padding: 48px 40px;
+  }
+  .hero-panel-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--dim);
+    margin-bottom: 36px;
+  }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 40px; }
+  .stat-item {}
+  .stat-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 48px; font-weight: 900; line-height: 1;
+    color: var(--amber); margin-bottom: 6px;
+  }
+  .stat-label { font-size: 12px; color: var(--mid); font-weight: 400; line-height: 1.4; }
+
+  .cert-strip {
+    border-top: 1px solid var(--border); padding-top: 32px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .cert-item {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 13px; color: var(--mid);
+  }
+  .cert-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--amber); flex-shrink: 0;
+  }
+
+  /* ── SECTION BASE ── */
+  section { padding: 100px 48px; }
+  .section-eyebrow {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--amber);
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(36px, 5vw, 56px); font-weight: 800;
+    line-height: 1.05; color: var(--offwhite); margin-bottom: 20px;
+  }
+  .section-sub {
+    font-size: 16px; color: var(--mid); max-width: 520px;
+    font-weight: 300; line-height: 1.7;
+  }
+  .section-header { margin-bottom: 64px; }
+
+  /* ── SERVICES ── */
+  #palvelut { background: var(--forge); border-top: 1px solid var(--border); }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .service-card {
+    background: var(--forge);
+    padding: 44px 36px;
+    position: relative; overflow: hidden;
+    transition: background 0.3s;
+  }
+  .service-card:hover { background: var(--steel); }
+  .service-card.featured { background: var(--steel); }
+  .service-card.featured::before {
+    content: 'PÄÄPALVELU';
+    position: absolute; top: 0; right: 0;
+    background: var(--amber); color: var(--black);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+    padding: 5px 12px;
+  }
+
+  .service-icon {
+    width: 48px; height: 48px; margin-bottom: 28px;
+    color: var(--amber);
+  }
+  .service-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 24px; font-weight: 800; color: var(--offwhite);
+    margin-bottom: 14px; letter-spacing: 0.02em;
+  }
+  .service-desc {
+    font-size: 14px; color: var(--mid); line-height: 1.7;
+    margin-bottom: 28px;
+  }
+  .service-list {
+    list-style: none; display: flex; flex-direction: column; gap: 8px;
+  }
+  .service-list li {
+    font-size: 13px; color: var(--mid);
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .service-list li::before {
+    content: '—'; color: var(--amber-dim); flex-shrink: 0; font-size: 12px; margin-top: 1px;
+  }
+
+  /* ── PROCESS ── */
+  #prosessi { background: var(--black); }
+  .process-track {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    position: relative; gap: 0;
+  }
+  .process-track::before {
+    content: '';
+    position: absolute; top: 28px; left: 10%; right: 10%;
+    height: 1px; background: var(--border);
+    z-index: 0;
+  }
+  .process-step { position: relative; z-index: 1; padding: 0 24px 0 0; }
+  .step-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
+    color: var(--amber); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .step-num::before {
+    content: attr(data-n);
+    display: flex; align-items: center; justify-content: center;
+    width: 56px; height: 56px;
+    background: var(--steel); border: 1px solid var(--border);
+    font-size: 20px; font-weight: 900; color: var(--amber);
+    flex-shrink: 0;
+  }
+  .step-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px; font-weight: 700; color: var(--offwhite);
+    margin-bottom: 10px;
+  }
+  .step-desc { font-size: 13px; color: var(--mid); line-height: 1.6; }
+
+  /* ── STANDARDS BAND ── */
+  .standards-band {
+    background: var(--steel); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    padding: 36px 48px;
+    display: flex; align-items: center; gap: 48px; overflow: hidden;
+  }
+  .standards-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--dim);
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .standards-scroll {
+    display: flex; gap: 40px; flex-wrap: wrap;
+  }
+  .std-badge {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px; font-weight: 700; letter-spacing: 0.08em;
+    color: var(--mid); white-space: nowrap;
+    border: 1px solid var(--border); padding: 8px 18px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .std-badge:hover { color: var(--amber); border-color: var(--amber-dim); }
+
+  /* ── CERTIFICATION ── */
+  #patevyys { background: var(--forge); border-top: 1px solid var(--border); }
+  .cert-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+  .cert-card {
+    background: var(--steel); border: 1px solid var(--border);
+    padding: 40px 36px; margin-bottom: 20px;
+  }
+  .cert-card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px; font-weight: 800; color: var(--offwhite);
+    margin-bottom: 8px;
+  }
+  .cert-card-std {
+    font-size: 12px; color: var(--amber); font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .cert-card-desc { font-size: 14px; color: var(--mid); line-height: 1.7; }
+
+  .cert-who {
+    padding: 36px; background: rgba(232,118,10,0.06);
+    border: 1px solid rgba(232,118,10,0.2); margin-top: 24px;
+  }
+  .cert-who-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px; font-weight: 700; color: var(--amber);
+    margin-bottom: 16px;
+  }
+  .cert-who ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .cert-who li { font-size: 14px; color: var(--mid); display: flex; gap: 10px; }
+  .cert-who li::before { content: '→'; color: var(--amber); }
+
+  .inspector-card {
+    background: var(--steel); border: 1px solid var(--border); padding: 44px 40px;
+    position: sticky; top: 100px;
+  }
+  .inspector-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 0.16em;
+    color: var(--amber); text-transform: uppercase; margin-bottom: 28px;
+  }
+  .inspector-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 36px; font-weight: 900; color: var(--offwhite);
+    margin-bottom: 6px; letter-spacing: 0.02em;
+  }
+  .inspector-role { font-size: 14px; color: var(--mid); margin-bottom: 36px; }
+  .cred-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 36px; }
+  .cred-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding-bottom: 14px; border-bottom: 1px solid var(--border);
+  }
+  .cred-item:last-child { border-bottom: none; }
+  .cred-icon { color: var(--amber); flex-shrink: 0; margin-top: 2px; }
+  .cred-text { font-size: 14px; color: var(--mid); line-height: 1.5; }
+  .cred-text strong { color: var(--offwhite); font-size: 15px; display: block; margin-bottom: 2px; }
+
+  /* ── WHY ── */
+  #miksi { background: var(--black); }
+  .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  .why-item { padding: 36px 28px; border: 1px solid var(--border); }
+  .why-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 64px; font-weight: 900; color: var(--border);
+    line-height: 1; margin-bottom: 20px; user-select: none;
+  }
+  .why-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px; font-weight: 700; color: var(--offwhite);
+    margin-bottom: 10px;
+  }
+  .why-text { font-size: 14px; color: var(--mid); line-height: 1.7; }
+
+  /* ── CONTACT ── */
+  #yhteystiedot {
+    background: var(--forge); border-top: 1px solid var(--border);
+  }
+  .contact-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+  .contact-info { display: flex; flex-direction: column; gap: 28px; }
+  .contact-line { display: flex; gap: 18px; align-items: flex-start; }
+  .contact-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--dim);
+    min-width: 80px; padding-top: 2px;
+  }
+  .contact-value { font-size: 16px; color: var(--offwhite); }
+  .contact-value a { color: var(--amber); text-decoration: none; }
+  .contact-value a:hover { color: var(--spark); }
+
+  /* Form */
+  .contact-form { display: flex; flex-direction: column; gap: 16px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group label {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--dim);
+  }
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    background: var(--steel); border: 1px solid var(--border);
+    color: var(--offwhite); padding: 14px 18px;
+    font-family: 'Inter', sans-serif; font-size: 14px;
+    outline: none; transition: border-color 0.2s;
+    appearance: none; -webkit-appearance: none;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    border-color: var(--amber);
+  }
+  .form-group textarea { resize: vertical; min-height: 120px; }
+  .form-group select option { background: var(--steel); }
+  .form-submit {
+    background: var(--amber); color: var(--black);
+    padding: 18px; border: none; cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; transition: background 0.2s;
+    margin-top: 8px;
+  }
+  .form-submit:hover { background: var(--spark); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--black); border-top: 1px solid var(--border);
+    padding: 40px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 20px;
+  }
+  .footer-logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px; font-weight: 800; letter-spacing: 0.06em;
+    color: var(--offwhite);
+  }
+  .footer-logo span { color: var(--amber); }
+  .footer-meta { font-size: 12px; color: var(--dim); }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 900px) {
+    nav { padding: 0 24px; }
+    .nav-links, .nav-cta { display: none; }
+    .nav-mobile-toggle { display: block; }
+
+    .hero { grid-template-columns: 1fr; padding: 100px 24px 60px; }
+    .hero-content { padding-right: 0; margin-bottom: 48px; }
+    .hero::after { display: none; }
+    .hero-panel { padding: 32px 24px; }
+    .stat-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+
+    section { padding: 72px 24px; }
+    .standards-band { padding: 24px; flex-direction: column; align-items: flex-start; gap: 20px; }
+
+    .services-grid { grid-template-columns: 1fr; }
+    .process-track { grid-template-columns: 1fr 1fr; gap: 40px; }
+    .process-track::before { display: none; }
+    .cert-layout { grid-template-columns: 1fr; gap: 48px; }
+    .inspector-card { position: static; }
+    .why-grid { grid-template-columns: 1fr; gap: 16px; }
+    .contact-layout { grid-template-columns: 1fr; gap: 48px; }
+    .form-row { grid-template-columns: 1fr; }
+    footer { padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#"><span>CER</span>WELD</a>
+  <ul class="nav-links">
+    <li><a href="#palvelut">Palvelut</a></li>
+    <li><a href="#patevyys">Pätevyyskokeet</a></li>
+    <li><a href="#prosessi">Prosessi</a></li>
+    <li><a href="#miksi">Miksi Cerweld</a></li>
+    <li><a href="#yhteystiedot">Yhteystiedot</a></li>
+  </ul>
+  <a class="nav-cta" href="#yhteystiedot">Pyydä tarjous</a>
+  <button class="nav-mobile-toggle" onclick="toggleMenu(this)">☰</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="etusivu">
+  <div class="hero-content reveal">
+    <div class="hero-eyebrow">Ammattihitsaus & Tarkastuspalvelut</div>
+    <h1 class="hero-title">
+      Laatu<br>
+      <em>hitsataan<br>sisään.</em>
+    </h1>
+    <p class="hero-sub">
+      Cerweld tarjoaa vaativaa ammattihitsausta, hitsaustarkastuksia ja pätevyyskokeita pohjalaisille yrityksille. Kansainvälinen hitsausinspektori palveluksessanne.
+    </p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="#yhteystiedot">Pyydä tarjous</a>
+      <a class="btn-ghost" href="#palvelut">Katso palvelut</a>
+    </div>
+  </div>
+
+  <div class="hero-panel reveal">
+    <div class="hero-panel-label">Cerweld — avainluvut</div>
+    <div class="stat-grid">
+      <div class="stat-item">
+        <div class="stat-num">IWI</div>
+        <div class="stat-label">Kansainvälinen hitsausinspektori (Mika Mäenpää)</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">ISO</div>
+        <div class="stat-label">Standardien mukainen toiminta — EN ISO 9606 & EN 287</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">MIG</div>
+        <div class="stat-label">MAG · TIG · Puikko · Erikoishitsaus</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">B2B</div>
+        <div class="stat-label">Teollisuus, metallirakenteet, alihankinta</div>
+      </div>
+    </div>
+    <div class="cert-strip">
+      <div class="cert-item"><span class="cert-dot"></span>SFS-EN ISO 9606-1 — Teräs</div>
+      <div class="cert-item"><span class="cert-dot"></span>SFS-EN ISO 9606-2 — Alumiini</div>
+      <div class="cert-item"><span class="cert-dot"></span>Hitsaustarkastukset & WPS-dokumentointi</div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="palvelut">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Palvelut</div>
+    <h2 class="section-title">Mitä teemme</h2>
+    <p class="section-sub">Hitsaus on ydintoimintamme. Tarkastus ja koulutus tukevat sitä — kokonaispalvelu yhdeltä luukulta.</p>
+  </div>
+
+  <div class="services-grid">
+    <!-- Welding — PRIMARY -->
+    <div class="service-card featured reveal">
+      <svg class="service-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 36L20 20l6 8 6-10 8 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="38" cy="12" r="4" stroke="currentColor" stroke-width="2"/>
+        <path d="M38 12 l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M4 44 h40" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div class="service-name">Ammattihitsaus</div>
+      <p class="service-desc">Vaativaa hitsaustyötä teollisuudelle, metallirakenteiden valmistukseen ja alihankintaan. Tarkat viimat, oikea sulautuma, ensimmäisellä kerralla.</p>
+      <ul class="service-list">
+        <li>MIG/MAG-hitsaus (teräs, ruostumaton)</li>
+        <li>TIG-hitsaus (alumiini, ohutlevy)</li>
+        <li>Puikkohitsaus (rakenteet, kenttätyö)</li>
+        <li>Erikoismateriaalit tarpeen mukaan</li>
+        <li>Yksittäiskappaleet & sarjavalmistus</li>
+        <li>Alihankinta teollisuudelle</li>
+      </ul>
+    </div>
+
+    <!-- Inspection -->
+    <div class="service-card reveal">
+      <svg class="service-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="12" stroke="currentColor" stroke-width="2.5"/>
+        <path d="M29 29 L42 42" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M14 20 h12M20 14 v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div class="service-name">Hitsaustarkastus</div>
+      <p class="service-desc">Puolueeton kolmannen osapuolen tarkastus varmistaa, että hitsit täyttävät standardien, direktiivien ja tilaajan vaatimukset.</p>
+      <ul class="service-list">
+        <li>Visuaalinen tarkastus (VT)</li>
+        <li>WPS- ja PQR-dokumentointi</li>
+        <li>Tarkastusraportit ja todistukset</li>
+        <li>Prosessitarkastukset tehtaalla/kentällä</li>
+        <li>NDT-koordinointi</li>
+      </ul>
+    </div>
+
+    <!-- Certification & Education -->
+    <div class="service-card reveal">
+      <svg class="service-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="10" width="36" height="28" rx="1" stroke="currentColor" stroke-width="2.5"/>
+        <path d="M14 22 l6 6 14-14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="service-name">Pätevyyskokeet & Koulutus</div>
+      <p class="service-desc">Viralliset hitsaajan pätevyyskokeet standardien mukaisesti. Pätevyyden hankinta, uusinta tai yrityksen koko tiimin sertifiointi.</p>
+      <ul class="service-list">
+        <li>SFS-EN ISO 9606-1 (teräs)</li>
+        <li>SFS-EN ISO 9606-2 (alumiini)</li>
+        <li>Pätevyyden uusintakokeet</li>
+        <li>Hitsaajien koulutus yrityksille</li>
+        <li>Henkilökohtainen ohjaus</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- STANDARDS BAND -->
+<div class="standards-band">
+  <div class="standards-label">Standardit & direktiivit</div>
+  <div class="standards-scroll">
+    <span class="std-badge">SFS-EN ISO 9606-1</span>
+    <span class="std-badge">SFS-EN ISO 9606-2</span>
+    <span class="std-badge">EN 287</span>
+    <span class="std-badge">EN 1090</span>
+    <span class="std-badge">ISO 3834</span>
+    <span class="std-badge">EN 15085</span>
+    <span class="std-badge">PED 2014/68/EU</span>
+    <span class="std-badge">IIW / IWI</span>
+  </div>
+</div>
+
+<!-- PROCESS -->
+<section id="prosessi">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Toimintamalli</div>
+    <h2 class="section-title">Miten toimimme</h2>
+    <p class="section-sub">Selkeä prosessi, ei ylimääräisiä kierroksia. Tarjouksesta valmiiseen hitsiin.</p>
+  </div>
+  <div class="process-track">
+    <div class="process-step reveal">
+      <div class="step-num" data-n="01">YHTEYDENOTTO</div>
+      <div class="step-title">Kerro tarpeestasi</div>
+      <p class="step-desc">Puhelu, sähköposti tai lomake. Kuvataan työ, materiaalit ja aikataulu — ei pitkiä paperisotia.</p>
+    </div>
+    <div class="process-step reveal">
+      <div class="step-num" data-n="02">TARJOUS</div>
+      <div class="step-title">Selkeä hinta</div>
+      <p class="step-desc">Saat kiinteän tarjouksen, jossa ei ole piilokustannuksia. Tarvittaessa käymme kohteessa katsomassa.</p>
+    </div>
+    <div class="process-step reveal">
+      <div class="step-num" data-n="03">TOTEUTUS</div>
+      <div class="step-title">Hitsaus tai tarkastus</div>
+      <p class="step-desc">Työ tehdään sovitussa aikataulussa ja standardien mukaisesti. Laatu varmistetaan prosessin aikana.</p>
+    </div>
+    <div class="process-step reveal">
+      <div class="step-num" data-n="04">DOKUMENTIT</div>
+      <div class="step-title">Todistukset valmiina</div>
+      <p class="step-desc">Pätevyystodistukset, tarkastusraportit ja muut dokumentit toimitetaan työn päätteeksi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICATION -->
+<section id="patevyys">
+  <div class="cert-layout">
+    <div>
+      <div class="section-header reveal">
+        <div class="section-eyebrow">Pätevyyskokeet</div>
+        <h2 class="section-title">Virallinen hitsaajan pätevyys</h2>
+        <p class="section-sub">Kansainvälisen hitsausinspektorin (IWI) valvomat pätevyyskokeet suoraan standardien mukaisesti.</p>
+      </div>
+
+      <div class="cert-card reveal">
+        <div class="cert-card-title">Teräksen hitsaajan pätevyyskoe</div>
+        <div class="cert-card-std">SFS-EN ISO 9606-1</div>
+        <p class="cert-card-desc">Eurooppalainen standardi teräksen sulahitsaukseen. Kattaa MIG/MAG, TIG, puikko- ja jauhekaarihitsauksen eri asento- ja putkivaihtoehdoilla.</p>
+      </div>
+
+      <div class="cert-card reveal">
+        <div class="cert-card-title">Alumiinin hitsaajan pätevyyskoe</div>
+        <div class="cert-card-std">SFS-EN ISO 9606-2</div>
+        <p class="cert-card-desc">Alumiinin ja alumiiniseosten sulahitsauksen pätevyyskoe. Tarkat vaatimukset materiaali- ja prosessiryhmille.</p>
+      </div>
+
+      <div class="cert-who reveal">
+        <div class="cert-who-title">Kenelle pätevyyskoe sopii?</div>
+        <ul>
+          <li>Hitsaajat, jotka tarvitsevat pätevyyden uuteen projektiin</li>
+          <li>Yritykset, jotka hakevat EN 1090 tai ISO 3834 -sertifiointia</li>
+          <li>Hitsaajat, joiden pätevyys on vanhenemassa</li>
+          <li>Uudet hitsaajat ensimmäiseen viralliseen pätevyyteen</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <div class="inspector-card reveal">
+        <div class="inspector-title">Valvova inspektori</div>
+        <div class="inspector-name">Mika Mäenpää</div>
+        <div class="inspector-role">International Welding Inspector (IWI) · Cerweld</div>
+
+        <div class="cred-list">
+          <div class="cred-item">
+            <div class="cred-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            </div>
+            <div class="cred-text">
+              <strong>IWI — International Welding Inspector</strong>
+              IIW:n (International Institute of Welding) myöntämä kansainvälinen pätevyys
+            </div>
+          </div>
+          <div class="cred-item">
+            <div class="cred-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <div class="cred-text">
+              <strong>Laaja kokemus teollisuudesta</strong>
+              Hitsaus, tarkastus ja koulutus vaativissa teollisuusympäristöissä
+            </div>
+          </div>
+          <div class="cred-item">
+            <div class="cred-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            </div>
+            <div class="cred-text">
+              <strong>Akkreditoitu koevalvonta</strong>
+              Standardien SFS-EN ISO 9606-1 ja 9606-2 mukainen koetoiminta
+            </div>
+          </div>
+        </div>
+
+        <a class="btn-primary" href="#yhteystiedot" style="width:100%;text-align:center;display:block;">
+          Varaa pätevyyskoe
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section id="miksi">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Miksi Cerweld</div>
+    <h2 class="section-title">Ammattitaito ei kompromisseja</h2>
+  </div>
+  <div class="why-grid">
+    <div class="why-item reveal">
+      <div class="why-num">01</div>
+      <div class="why-title">Yksi nimi, täysi vastuu</div>
+      <p class="why-text">Mika Mäenpää on henkilökohtaisesti vastuussa jokaisesta hitsistä ja tarkastuksesta. Ei alihankkijoiden ketjuja, ei vastuunsiirtoja.</p>
+    </div>
+    <div class="why-item reveal">
+      <div class="why-num">02</div>
+      <div class="why-title">Kansainvälinen pätevyys</div>
+      <p class="why-text">IWI-tittelillä valvottu työ kelpaa vaativimpiin teollisuusprojekteihin — EN 1090, ISO 3834, PED-direktiivi.</p>
+    </div>
+    <div class="why-item reveal">
+      <div class="why-num">03</div>
+      <div class="why-title">Pohjanmaa tuntee Cerweldin</div>
+      <p class="why-text">Paikalliset yritykset saavat nopeaa palvelua ilman pitkiä odotusaikoja. Kohteessa käynti onnistuu joustavasti.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="yhteystiedot">
+  <div class="contact-layout">
+    <div class="reveal">
+      <div class="section-eyebrow">Yhteystiedot</div>
+      <h2 class="section-title">Otetaan yhteyttä</h2>
+      <p class="section-sub" style="margin-bottom:48px;">Tarjouspyyntö, pätevyyskoe tai hitsaustarkastus — ota yhteyttä, vastataan nopeasti.</p>
+
+      <div class="contact-info">
+        <div class="contact-line">
+          <span class="contact-label">Puhelin</span>
+          <span class="contact-value"><a href="tel:+358449221090">+358 44 922 1090</a></span>
+        </div>
+        <div class="contact-line">
+          <span class="contact-label">Sähköposti</span>
+          <span class="contact-value"><a href="mailto:mika.maenpaa@cerweld.fi">mika.maenpaa@cerweld.fi</a></span>
+        </div>
+        <div class="contact-line">
+          <span class="contact-label">Verkkosivut</span>
+          <span class="contact-value"><a href="https://www.cerweld.fi" target="_blank">www.cerweld.fi</a></span>
+        </div>
+        <div class="contact-line">
+          <span class="contact-label">Alue</span>
+          <span class="contact-value">Pohjanmaa & lähialueet</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <div class="contact-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nimi</label>
+            <input type="text" placeholder="Etunimi Sukunimi">
+          </div>
+          <div class="form-group">
+            <label>Yritys</label>
+            <input type="text" placeholder="Yritys Oy">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Sähköposti</label>
+          <input type="email" placeholder="sinä@yritys.fi">
+        </div>
+        <div class="form-group">
+          <label>Palvelu</label>
+          <select>
+            <option value="">— Valitse palvelu —</option>
+            <option>Ammattihitsaus</option>
+            <option>Hitsaustarkastus</option>
+            <option>Pätevyyskoe (9606-1, teräs)</option>
+            <option>Pätevyyskoe (9606-2, alumiini)</option>
+            <option>Koulutus yritykselle</option>
+            <option>Muu / Useampi</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Viesti</label>
+          <textarea placeholder="Kerro lyhyesti tarpeestanne — materiaali, työn laajuus, aikataulu..."></textarea>
+        </div>
+        <button class="form-submit">Lähetä tarjouspyyntö →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo"><span>CER</span>WELD</div>
+  <div class="footer-meta">© 2024 Cerweld · Mika Mäenpää · mika.maenpaa@cerweld.fi · +358 44 922 1090</div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(r => observer.observe(r));
+
+  // Mobile menu
+  function toggleMenu(btn) {
+    let menu = document.getElementById('mobileMenu');
+    if (menu) { menu.remove(); btn.textContent = '☰'; return; }
+    menu = document.createElement('div');
+    menu.id = 'mobileMenu';
+    Object.assign(menu.style, {
+      position: 'fixed', top: '68px', left: '0', right: '0',
+      background: '#0D1110', borderBottom: '1px solid #1E2825',
+      padding: '24px', zIndex: '99', display: 'flex',
+      flexDirection: 'column', gap: '20px'
+    });
+    ['Palvelut|#palvelut','Pätevyyskokeet|#patevyys','Prosessi|#prosessi','Miksi Cerweld|#miksi','Yhteystiedot|#yhteystiedot'].forEach(item => {
+      const [label, href] = item.split('|');
+      const a = document.createElement('a');
+      a.href = href; a.textContent = label;
+      Object.assign(a.style, { color: '#F0EBE3', fontSize: '18px', fontFamily: "'Barlow Condensed', sans-serif", fontWeight: '700', textDecoration: 'none', letterSpacing: '0.06em' });
+      a.onclick = () => { menu.remove(); btn.textContent = '☰'; };
+      menu.appendChild(a);
+    });
+    document.body.appendChild(menu);
+    btn.textContent = '✕';
+  }
+
+  // Smooth nav active state
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+    navLinks.forEach(a => {
+      a.style.color = a.getAttribute('href') === '#' + current ? '#E8760A' : '';
+    });
+  });
+</script>
+</body>
+</html>
