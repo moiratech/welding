@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cerweld – Hitsauksen asiantuntijapalvelut</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black:    #080809;
+    --steel:    #16191f;
+    --iron:     #1e2530;
+    --arc:      #E8620A;
+    --arc-dim:  #7A3207;
+    --arc-glow: rgba(232,98,10,0.18);
+    --smoke:    #8A95A3;
+    --ash:      #C8CDD4;
+    --white:    #F0F2F5;
+    --pure:     #FFFFFF;
+    --warm:     #F5F0E8;
+
+    --font-display: 'Barlow Condensed', sans-serif;
+    --font-body:    'Inter', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--ash);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ═══════════════════════════════
+     METAL TEXTURE MIXIN (reused)
+     Brushed steel via SVG filter + gradients
+  ═══════════════════════════════ */
+  .metal-bg {
+    position: relative;
+  }
+  .metal-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(
+        92deg,
+        rgba(255,255,255,0.018) 0px,
+        rgba(255,255,255,0.018) 1px,
+        transparent 1px,
+        transparent 3px
+      ),
+      repeating-linear-gradient(
+        88deg,
+        rgba(255,255,255,0.008) 0px,
+        rgba(255,255,255,0.008) 1px,
+        transparent 1px,
+        transparent 8px
+      ),
+      linear-gradient(
+        180deg,
+        rgba(255,255,255,0.06) 0%,
+        rgba(255,255,255,0.02) 40%,
+        rgba(0,0,0,0.12) 100%
+      );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .metal-panel {
+    background:
+      repeating-linear-gradient(
+        91deg,
+        rgba(255,255,255,0.025) 0px,
+        rgba(255,255,255,0.025) 1px,
+        transparent 1px,
+        transparent 4px
+      ),
+      linear-gradient(160deg, #23282f 0%, #1a1e26 50%, #12151a 100%);
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 48px;
+    height: 64px;
+    background: rgba(8,8,9,0.94);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(232,98,10,0.2);
+    /* subtle metal sheen on nav */
+    box-shadow: 0 1px 0 rgba(255,255,255,0.04), 0 2px 20px rgba(0,0,0,0.4);
+  }
+
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: var(--white);
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--arc); }
+
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--smoke); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--arc); }
+
+  .nav-cta {
+    background: var(--arc) !important;
+    color: var(--pure) !important;
+    padding: 8px 18px; border-radius: 2px;
+    font-weight: 700 !important;
+    transition: background 0.2s !important;
+  }
+  .nav-cta:hover { background: #c4520a !important; }
+
+  /* ══════════════════════════════
+     HERO — brushed steel + arc glow
+  ══════════════════════════════ */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    padding: 120px 48px 80px;
+  }
+
+  /* Layer 1: dark steel base */
+  .hero-metal {
+    position: absolute; inset: 0;
+    background:
+      repeating-linear-gradient(
+        91deg,
+        rgba(255,255,255,0.022) 0px,
+        rgba(255,255,255,0.022) 1px,
+        transparent 1px,
+        transparent 3px
+      ),
+      repeating-linear-gradient(
+        89deg,
+        rgba(255,255,255,0.01) 0px,
+        rgba(255,255,255,0.01) 1px,
+        transparent 1px,
+        transparent 9px
+      ),
+      linear-gradient(145deg,
+        #0e1118 0%,
+        #181d26 35%,
+        #1a2030 60%,
+        #0c0f14 100%
+      );
+  }
+
+  /* Layer 2: arc weld glow from bottom-right */
+  .hero-glow {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 55% 45% at 78% 85%, rgba(232,98,10,0.22) 0%, transparent 65%),
+      radial-gradient(ellipse 30% 30% at 78% 85%, rgba(255,160,60,0.12) 0%, transparent 50%);
+  }
+
+  /* Layer 3: weld spatter dots */
+  .hero-spatter {
+    position: absolute; inset: 0;
+    overflow: hidden;
+  }
+  .hero-spatter::before {
+    content: '';
+    position: absolute;
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: var(--arc);
+    box-shadow:
+      620px 480px 0 1px rgba(232,98,10,0.6),
+      680px 510px 0 0.5px rgba(232,98,10,0.4),
+      640px 530px 0 1px rgba(232,98,10,0.3),
+      700px 470px 0 1.5px rgba(232,98,10,0.5),
+      660px 555px 0 0.5px rgba(232,98,10,0.25),
+      750px 490px 0 1px rgba(232,98,10,0.35),
+      590px 500px 0 0.5px rgba(255,160,80,0.5),
+      730px 540px 0 1px rgba(255,180,60,0.3);
+  }
+
+  .hero-content {
+    position: relative; z-index: 2;
+    max-width: 700px;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--arc); margin-bottom: 24px;
+  }
+  .hero-eyebrow::before {
+    content: ''; display: block;
+    width: 28px; height: 2px; background: var(--arc);
+  }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(52px, 8vw, 96px);
+    font-weight: 800; line-height: 0.92;
+    letter-spacing: -0.01em; text-transform: uppercase;
+    color: var(--white); margin-bottom: 32px;
+  }
+  .hero h1 em { font-style: normal; color: var(--arc); display: block; }
+
+  .hero-desc {
+    font-size: 17px; font-weight: 300;
+    color: var(--smoke); max-width: 500px;
+    margin-bottom: 48px; line-height: 1.75;
+  }
+
+  .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--arc); color: var(--pure);
+    padding: 14px 28px; font-size: 13px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    text-decoration: none; border-radius: 2px;
+    transition: background 0.2s, transform 0.15s;
+    box-shadow: 0 4px 20px rgba(232,98,10,0.35);
+  }
+  .btn-primary:hover { background: #c4520a; transform: translateY(-1px); }
+
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 10px;
+    border: 1px solid rgba(138,149,163,0.35);
+    color: var(--ash); padding: 14px 28px;
+    font-size: 13px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    text-decoration: none; border-radius: 2px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--arc); color: var(--arc); }
+
+  /* Hero right — welder illustration */
+  .hero-visual {
+    position: absolute; right: 0; bottom: 0; top: 0;
+    width: 46%; z-index: 1;
+    display: flex; align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* SVG welder silhouette */
+  .welder-wrap {
+    position: relative;
+    width: 100%; height: 100%;
+    display: flex; align-items: flex-end;
+  }
+
+  .hero-stats {
+    margin-top: 64px; padding-top: 36px;
+    border-top: 1px solid rgba(138,149,163,0.12);
+    display: flex; gap: 48px; flex-wrap: wrap;
+  }
+  .stat-number {
+    font-family: var(--font-display); font-size: 40px;
+    font-weight: 800; color: var(--white); line-height: 1;
+  }
+  .stat-number span { color: var(--arc); }
+  .stat-label {
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--smoke); margin-top: 4px;
+  }
+
+  /* ══════════════════════════════
+     HUMAN QUOTE BAND
+  ══════════════════════════════ */
+  .quote-band {
+    position: relative; overflow: hidden;
+    padding: 72px 48px;
+    background:
+      repeating-linear-gradient(
+        90deg,
+        rgba(255,255,255,0.02) 0px,
+        rgba(255,255,255,0.02) 1px,
+        transparent 1px,
+        transparent 5px
+      ),
+      linear-gradient(135deg, #1a1200 0%, #231a0a 50%, #1a1200 100%);
+    border-top: 1px solid rgba(232,98,10,0.25);
+    border-bottom: 1px solid rgba(232,98,10,0.25);
+  }
+
+  .quote-inner {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: auto 1fr;
+    gap: 48px; align-items: center;
+  }
+
+  .quote-avatar {
+    width: 96px; height: 96px; border-radius: 50%;
+    background: linear-gradient(135deg, #2a1e10 0%, #3a2a15 100%);
+    border: 3px solid var(--arc);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-size: 36px;
+    font-weight: 800; color: var(--arc);
+    flex-shrink: 0;
+    box-shadow: 0 0 24px rgba(232,98,10,0.25);
+  }
+
+  .quote-text blockquote {
+    font-size: clamp(18px, 2.5vw, 26px);
+    font-weight: 300; line-height: 1.55;
+    color: var(--warm);
+    font-style: italic;
+    margin-bottom: 16px;
+  }
+  .quote-text blockquote::before { content: '\201C'; color: var(--arc); font-size: 1.4em; font-style: normal; }
+  .quote-text blockquote::after  { content: '\201D'; color: var(--arc); font-size: 1.4em; font-style: normal; }
+
+  .quote-attr {
+    font-size: 13px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--arc);
+  }
+  .quote-attr span { color: var(--smoke); font-weight: 400; text-transform: none; letter-spacing: 0; margin-left: 8px; }
+
+  /* ══════════════════════════════
+     SERVICES
+  ══════════════════════════════ */
+  #palvelut {
+    position: relative; padding: 100px 48px;
+    background:
+      repeating-linear-gradient(
+        92deg,
+        rgba(255,255,255,0.016) 0px,
+        rgba(255,255,255,0.016) 1px,
+        transparent 1px,
+        transparent 4px
+      ),
+      linear-gradient(180deg, #12161d 0%, #0e1118 100%);
+  }
+
+  .section-inner { max-width: 1160px; margin: 0 auto; }
+
+  .section-eyebrow {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--arc); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-eyebrow::before {
+    content: ''; display: block; width: 20px; height: 2px; background: var(--arc);
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 800; text-transform: uppercase;
+    color: var(--white); line-height: 1; margin-bottom: 20px;
+  }
+  .section-sub {
+    font-size: 16px; color: var(--smoke);
+    max-width: 520px; line-height: 1.75; font-weight: 300;
+  }
+
+  .services-header {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 48px; margin-bottom: 56px; align-items: end;
+  }
+
+  .services-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; }
+
+  .service-card {
+    background:
+      repeating-linear-gradient(
+        91deg,
+        rgba(255,255,255,0.018) 0px,
+        rgba(255,255,255,0.018) 1px,
+        transparent 1px,
+        transparent 4px
+      ),
+      linear-gradient(160deg, #1e2530 0%, #181d26 100%);
+    padding: 40px 32px; position: relative; overflow: hidden;
+    transition: background 0.25s; cursor: default;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .service-card::after {
+    content: ''; position: absolute;
+    bottom: 0; left: 0; width: 0; height: 3px;
+    background: var(--arc); transition: width 0.35s ease;
+  }
+  .service-card:hover::after { width: 100%; }
+  .service-card:hover {
+    background:
+      repeating-linear-gradient(
+        91deg,
+        rgba(255,255,255,0.025) 0px,
+        rgba(255,255,255,0.025) 1px,
+        transparent 1px,
+        transparent 4px
+      ),
+      linear-gradient(160deg, #252d3c 0%, #1e2530 100%);
+  }
+
+  .service-icon { width: 44px; height: 44px; margin-bottom: 22px; color: var(--arc); }
+  .service-card h3 {
+    font-family: var(--font-display); font-size: 21px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--white); margin-bottom: 10px;
+  }
+  .service-card p { font-size: 14px; color: var(--smoke); line-height: 1.65; }
+  .service-tag {
+    display: inline-block; margin-top: 18px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--arc);
+    border: 1px solid var(--arc-dim); padding: 4px 10px; border-radius: 1px;
+  }
+
+  /* ══════════════════════════════
+     TESTIMONIALS
+  ══════════════════════════════ */
+  .testimonials {
+    padding: 80px 48px;
+    background:
+      repeating-linear-gradient(
+        93deg,
+        rgba(255,255,255,0.014) 0px,
+        rgba(255,255,255,0.014) 1px,
+        transparent 1px,
+        transparent 6px
+      ),
+      linear-gradient(160deg, #1a1e28 0%, #12161e 100%);
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .testimonials-inner { max-width: 1160px; margin: 0 auto; }
+
+  .testimonials-grid {
+    display: grid; grid-template-columns: repeat(3,1fr);
+    gap: 24px; margin-top: 48px;
+  }
+
+  .testi-card {
+    padding: 32px;
+    background:
+      repeating-linear-gradient(
+        91deg,
+        rgba(255,255,255,0.015) 0px,
+        rgba(255,255,255,0.015) 1px,
+        transparent 1px,
+        transparent 5px
+      ),
+      linear-gradient(145deg, #1c2130 0%, #161b26 100%);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 2px;
+    position: relative;
+  }
+  .testi-card::before {
+    content: '\201C';
+    position: absolute; top: 20px; right: 24px;
+    font-size: 64px; font-family: Georgia, serif;
+    color: rgba(232,98,10,0.15); line-height: 1;
+  }
+
+  .testi-stars {
+    display: flex; gap: 4px; margin-bottom: 16px;
+  }
+  .testi-stars span { color: var(--arc); font-size: 14px; }
+
+  .testi-text {
+    font-size: 14px; color: var(--ash);
+    line-height: 1.7; margin-bottom: 24px;
+    font-style: italic;
+  }
+
+  .testi-author { display: flex; align-items: center; gap: 12px; }
+
+  .testi-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--iron), var(--steel));
+    border: 2px solid rgba(232,98,10,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-size: 16px;
+    font-weight: 700; color: var(--arc); flex-shrink: 0;
+  }
+
+  .testi-name { font-size: 13px; font-weight: 600; color: var(--white); }
+  .testi-role { font-size: 11px; color: var(--smoke); margin-top: 1px; }
+
+  /* ══════════════════════════════
+     STANDARDS
+  ══════════════════════════════ */
+  #standardit {
+    padding: 100px 48px;
+    background:
+      repeating-linear-gradient(
+        91deg,
+        rgba(255,255,255,0.02) 0px,
+        rgba(255,255,255,0.02) 1px,
+        transparent 1px,
+        transparent 4px
+      ),
+      linear-gradient(180deg, #0a0c10 0%, #0e1118 100%);
+  }
+
+  .standards-layout {
+    display: grid; grid-template-columns: 1fr 1.4fr;
+    gap: 80px; align-items: center;
+  }
+
+  .cert-block {
+    padding: 28px 32px;
+    background:
+      repeating-linear-gradient(
+        90deg,
+        rgba(255,255,255,0.02) 0px,
+        rgba(255,255,255,0.02) 1px,
+        transparent 1px,
+        transparent 5px
+      ),
+      linear-gradient(135deg, #1e2530 0%, #161b24 100%);
+    border: 1px solid rgba(232,98,10,0.2);
+    border-radius: 2px;
+  }
+  .cert-block + .cert-block { margin-top: 12px; }
+
+  .cert-code {
+    font-family: var(--font-display); font-size: 26px;
+    font-weight: 800; color: var(--arc); letter-spacing: 0.06em;
+  }
+  .cert-name { font-size: 13px; color: var(--ash); margin-top: 4px; }
+  .cert-desc { font-size: 12px; color: var(--smoke); margin-top: 10px; line-height: 1.55; }
+
+  .auth-badge {
+    margin-top: 24px;
+    display: inline-flex; align-items: center; gap: 12px;
+    background: rgba(232,98,10,0.08);
+    border: 1px solid rgba(232,98,10,0.3);
+    padding: 14px 18px; border-radius: 2px; width: 100%;
+  }
+  .auth-badge-icon { width: 28px; height: 28px; color: var(--arc); flex-shrink: 0; }
+  .auth-badge-text { font-size: 12px; color: var(--ash); line-height: 1.4; }
+  .auth-badge-text strong { display: block; font-size: 13px; color: var(--white); font-weight: 600; }
+
+  .process-steps { display: flex; flex-direction: column; margin-top: 40px; }
+  .process-step {
+    display: flex; gap: 20px;
+    padding: 20px 0; border-bottom: 1px solid rgba(138,149,163,0.1);
+  }
+  .process-step:last-child { border-bottom: none; }
+  .step-num {
+    font-family: var(--font-display); font-size: 30px;
+    font-weight: 800; color: rgba(232,98,10,0.28);
+    line-height: 1; min-width: 36px;
+  }
+  .step-text h4 { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+  .step-text p { font-size: 13px; color: var(--smoke); }
+
+  /* ══════════════════════════════
+     EXPERT — human section
+  ══════════════════════════════ */
+  #miksi {
+    padding: 100px 48px;
+    background:
+      repeating-linear-gradient(
+        92deg,
+        rgba(255,255,255,0.018) 0px,
+        rgba(255,255,255,0.018) 1px,
+        transparent 1px,
+        transparent 5px
+      ),
+      linear-gradient(145deg, #151a22 0%, #0f1318 100%);
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .why-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 72px; margin-top: 60px; align-items: start;
+  }
+
+  .why-points { display: flex; flex-direction: column; gap: 26px; }
+  .why-point { display: flex; gap: 14px; align-items: flex-start; }
+  .why-point-icon { width: 18px; height: 18px; color: var(--arc); flex-shrink: 0; margin-top: 3px; }
+  .why-point h4 { font-size: 15px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+  .why-point p { font-size: 14px; color: var(--smoke); line-height: 1.6; }
+
+  /* Human profile card */
+  .expert-card {
+    background:
+      repeating-linear-gradient(
+        90deg,
+        rgba(255,255,255,0.02) 0px,
+        rgba(255,255,255,0.02) 1px,
+        transparent 1px,
+        transparent 6px
+      ),
+      linear-gradient(145deg, #1c2230 0%, #141820 100%);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-left: 4px solid var(--arc);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .expert-photo-area {
+    background:
+      linear-gradient(135deg, #1a2030 0%, #0f1318 100%);
+    padding: 40px 40px 28px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; gap: 24px; align-items: flex-start;
+  }
+
+  .expert-avatar {
+    width: 80px; height: 80px; border-radius: 4px;
+    background: linear-gradient(145deg, #2a1e10, #3a2a15);
+    border: 2px solid rgba(232,98,10,0.5);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-size: 30px;
+    font-weight: 800; color: var(--arc); flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 20px rgba(232,98,10,0.15);
+  }
+
+  .expert-title-block { }
+  .expert-name {
+    font-family: var(--font-display); font-size: 26px;
+    font-weight: 800; text-transform: uppercase;
+    color: var(--white); letter-spacing: 0.04em;
+  }
+  .expert-role {
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--arc); margin-top: 4px;
+  }
+  .expert-contact-mini {
+    margin-top: 12px; display: flex; flex-direction: column; gap: 4px;
+  }
+  .expert-contact-mini a {
+    font-size: 13px; color: var(--smoke); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .expert-contact-mini a:hover { color: var(--arc); }
+
+  .expert-body { padding: 28px 40px 36px; }
+  .expert-bio {
+    font-size: 14px; color: var(--smoke); line-height: 1.7;
+    margin-bottom: 24px;
+  }
+  /* Personal quote from Mika */
+  .expert-personal-quote {
+    background: rgba(232,98,10,0.07);
+    border-left: 3px solid var(--arc);
+    padding: 16px 20px; margin-bottom: 24px;
+    border-radius: 0 2px 2px 0;
+  }
+  .expert-personal-quote p {
+    font-size: 14px; color: var(--warm);
+    font-style: italic; line-height: 1.6;
+  }
+  .expert-personal-quote cite {
+    display: block; margin-top: 8px;
+    font-size: 11px; color: var(--arc);
+    font-style: normal; font-weight: 600; letter-spacing: 0.1em;
+  }
+
+  .credentials { display: flex; flex-direction: column; gap: 8px; }
+  .credential-item {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: var(--ash);
+  }
+  .credential-item::before {
+    content: '✓'; color: var(--arc);
+    font-weight: 700; font-size: 14px;
+  }
+
+  /* ══════════════════════════════
+     CONTACT
+  ══════════════════════════════ */
+  #yhteystiedot {
+    padding: 100px 48px;
+    background:
+      repeating-linear-gradient(
+        92deg,
+        rgba(255,255,255,0.016) 0px,
+        rgba(255,255,255,0.016) 1px,
+        transparent 1px,
+        transparent 4px
+      ),
+      linear-gradient(160deg, #0c0e13 0%, #080a0e 100%);
+  }
+
+  .contact-layout {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 80px; margin-top: 60px; align-items: start;
+  }
+
+  .contact-item {
+    display: flex; gap: 16px; align-items: flex-start;
+    padding: 22px 0; border-bottom: 1px solid rgba(138,149,163,0.1);
+  }
+  .contact-item:first-child { border-top: 1px solid rgba(138,149,163,0.1); }
+  .contact-item-icon { width: 20px; height: 20px; color: var(--arc); flex-shrink: 0; margin-top: 2px; }
+  .contact-item-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--smoke); margin-bottom: 4px;
+  }
+  .contact-item-value { font-size: 15px; color: var(--white); text-decoration: none; }
+  a.contact-item-value:hover { color: var(--arc); }
+
+  .contact-form { display: flex; flex-direction: column; gap: 14px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--smoke);
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    background:
+      repeating-linear-gradient(
+        90deg,
+        rgba(255,255,255,0.012) 0px,
+        rgba(255,255,255,0.012) 1px,
+        transparent 1px,
+        transparent 5px
+      ),
+      #1a1f2a;
+    border: 1px solid rgba(138,149,163,0.18);
+    color: var(--white); padding: 12px 16px;
+    font-size: 14px; font-family: var(--font-body);
+    border-radius: 2px; outline: none; transition: border-color 0.2s;
+    appearance: none;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color: var(--arc); }
+  .form-group textarea { min-height: 110px; resize: vertical; }
+  .form-group select option { background: #1a1f2a; }
+
+  .form-submit {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: var(--arc); color: var(--pure);
+    padding: 14px 28px; font-size: 13px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    border: none; cursor: pointer; border-radius: 2px;
+    transition: background 0.2s;
+    box-shadow: 0 4px 20px rgba(232,98,10,0.3);
+  }
+  .form-submit:hover { background: #c4520a; }
+
+  /* ══════════════════════════════
+     FOOTER
+  ══════════════════════════════ */
+  footer {
+    background: #040506;
+    padding: 44px 48px;
+    border-top: 1px solid rgba(138,149,163,0.08);
+  }
+  .footer-inner {
+    max-width: 1160px; margin: 0 auto;
+    display: flex; justify-content: space-between;
+    align-items: center; flex-wrap: wrap; gap: 20px;
+  }
+  .footer-logo {
+    font-family: var(--font-display); font-size: 18px;
+    font-weight: 800; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--white); text-decoration: none;
+  }
+  .footer-logo span { color: var(--arc); }
+  .footer-copy { font-size: 12px; color: var(--smoke); }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { font-size: 12px; color: var(--smoke); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--arc); }
+
+  /* ══════════════════════════════
+     SCROLL REVEAL
+  ══════════════════════════════ */
+  .reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ══════════════════════════════
+     MOBILE
+  ══════════════════════════════ */
+  @media (max-width: 900px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .hero { padding: 100px 20px 60px; }
+    .hero-visual { display: none; }
+    section, #palvelut, #standardit, #miksi, #yhteystiedot { padding: 72px 20px; }
+    .quote-inner { grid-template-columns: 1fr; }
+    .services-header { grid-template-columns: 1fr; gap: 20px; }
+    .services-grid { grid-template-columns: 1fr; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .standards-layout { grid-template-columns: 1fr; gap: 40px; }
+    .why-grid { grid-template-columns: 1fr; gap: 40px; }
+    .contact-layout { grid-template-columns: 1fr; gap: 40px; }
+    .form-row { grid-template-columns: 1fr; }
+    .footer-inner { flex-direction: column; align-items: flex-start; }
+    .hero-stats { gap: 28px; }
+    .testimonials { padding: 72px 20px; }
+    .quote-band { padding: 48px 20px; }
+    footer { padding: 40px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Cer<span>W</span>eld</a>
+  <ul class="nav-links">
+    <li><a href="#palvelut">Palvelut</a></li>
+    <li><a href="#standardit">Standardit</a></li>
+    <li><a href="#miksi">Asiantuntija</a></li>
+    <li><a href="#yhteystiedot" class="nav-cta">Ota yhteyttä</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="etusivu">
+  <div class="hero-metal"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-spatter"></div>
+
+  <!-- Right visual: welder SVG -->
+  <div class="hero-visual">
+    <svg viewBox="0 0 460 600" style="width:100%;height:100%;object-fit:contain;opacity:0.22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Welder silhouette (stylised) -->
+      <!-- Body -->
+      <rect x="160" y="260" width="140" height="220" rx="8" fill="#E8620A"/>
+      <!-- Head / helmet -->
+      <rect x="170" y="160" width="120" height="100" rx="10" fill="#c4520a"/>
+      <rect x="182" y="195" width="96" height="48" rx="4" fill="#0a0a10"/>
+      <!-- Helmet visor glow -->
+      <rect x="185" y="198" width="90" height="42" rx="3" fill="rgba(232,160,10,0.15)"/>
+      <!-- Arms -->
+      <rect x="100" y="270" width="60" height="24" rx="8" fill="#c4520a"/>
+      <rect x="300" y="270" width="60" height="24" rx="8" fill="#c4520a"/>
+      <!-- Welding torch arm -->
+      <rect x="60" y="285" width="50" height="14" rx="6" fill="#888" transform="rotate(-20 60 285)"/>
+      <!-- Arc spark lines -->
+      <line x1="55" y1="320" x2="20" y2="370" stroke="#E8620A" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <line x1="50" y1="318" x2="10" y2="340" stroke="#ffaa40" stroke-width="1" stroke-dasharray="3 4" opacity="0.7"/>
+      <line x1="58" y1="325" x2="30" y2="395" stroke="#E8620A" stroke-width="0.8" stroke-dasharray="2 5" opacity="0.5"/>
+      <!-- Spatter dots around arc -->
+      <circle cx="18" cy="372" r="2" fill="#E8620A" opacity="0.8"/>
+      <circle cx="8" cy="342" r="1.5" fill="#ffaa40" opacity="0.7"/>
+      <circle cx="35" cy="398" r="1" fill="#E8620A" opacity="0.5"/>
+      <circle cx="5" cy="360" r="1" fill="#ff8020" opacity="0.6"/>
+      <!-- Legs -->
+      <rect x="165" y="470" width="50" height="100" rx="6" fill="#c4520a"/>
+      <rect x="245" y="470" width="50" height="100" rx="6" fill="#c4520a"/>
+      <!-- Boots -->
+      <rect x="158" y="558" width="64" height="28" rx="4" fill="#333"/>
+      <rect x="238" y="558" width="64" height="28" rx="4" fill="#333"/>
+      <!-- Ground reflection line -->
+      <line x1="80" y1="590" x2="380" y2="590" stroke="rgba(232,98,10,0.3)" stroke-width="1"/>
+    </svg>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">Hitsauksen asiantuntijapalvelut</div>
+    <h1>
+      Hitsaajan<br>
+      <em>Pätevyys</em><br>
+      Tehtynä Oikein
+    </h1>
+    <p class="hero-desc">
+      Kiwa Inspectan valtuuttama kansainvälinen hitsausinsinööri (IWE) valvoo pätevyyskokeesi standardien ISO 9606-1 ja 9606-2 mukaisesti — joustavasti, huolella, ensimmäisellä kerralla.
+    </p>
+    <div class="hero-actions">
+      <a href="#yhteystiedot" class="btn-primary">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.22 1.2 2 2 0 012.22.02h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+        Pyydä tarjous
+      </a>
+      <a href="#palvelut" class="btn-ghost">Tutustu palveluihin →</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-number">ISO<span> 9606</span></div>
+        <div class="stat-label">Teräs & Alumiini</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number"><span>IWE</span></div>
+        <div class="stat-label">Kansainvälinen insinööri</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">Kiwa<span>✓</span></div>
+        <div class="stat-label">Valtuutettu valvoja</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HUMAN QUOTE BAND -->
+<div class="quote-band">
+  <div class="quote-inner">
+    <div class="quote-avatar">MM</div>
+    <div class="quote-text">
+      <blockquote>
+        Olen nähnyt liian monta koetta, jossa pätevyysalue jätettiin liian kapeaksi. Yksi oikein suunniteltu koe voi kattaa koko tuotannon tarpeet — se on minun tehtäväni varmistaa.
+      </blockquote>
+      <div class="quote-attr">Mika Mäenpää <span>— IWE, Cerweld</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="palvelut">
+  <div class="section-inner">
+    <div class="services-header reveal">
+      <div>
+        <div class="section-eyebrow">Palvelut</div>
+        <h2 class="section-title">Mitä<br>Tarjoamme</h2>
+      </div>
+      <p class="section-sub">Hitsauksen pätevyyskokeet, koordinointi ja tarkastus — kaikki saman kokeneen asiantuntijan kautta, joustavasti aikatauluusi sopien.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <svg class="service-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z"/></svg>
+        <h3>Pätevyyskokeet</h3>
+        <p>ISO 9606-1 (teräs) ja ISO 9606-2 (alumiini) mukaiset hitsaajan pätevyyskokeet. Valvoja optimoi pätevyysalueen tuotantosi tarpeiden mukaan.</p>
+        <span class="service-tag">ISO 9606-1 / -2</span>
+      </div>
+      <div class="service-card reveal">
+        <svg class="service-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"/></svg>
+        <h3>Hitsauskoordinointi</h3>
+        <p>IWE-tasoinen koordinointi — hitsausohjeet (WPS), menetelmäkoestukset (WPQR) ja laadunhallinta standardien mukaisesti tuotantosi tarpeisiin.</p>
+        <span class="service-tag">IWE-taso</span>
+      </div>
+      <div class="service-card reveal">
+        <svg class="service-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <h3>Hitsaustarkastus</h3>
+        <p>Ammattimainen silmämääräinen tarkastus ja dokumentointi. Hitsausliitosten laadun varmistaminen standardien ja tilaajan vaatimusten mukaisesti.</p>
+        <span class="service-tag">Visuaalinen / NDT</span>
+      </div>
+      <div class="service-card reveal">
+        <svg class="service-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+        <h3>WPS-dokumentointi</h3>
+        <p>Hitsausohjeiden (WPS) laadinta ja validointi MIG/MAG-, TIG- ja puikkohitsaukseen. Prosessikohtaiset ohjeet tuotantosi vaatimuksiin.</p>
+        <span class="service-tag">EN ISO 15614</span>
+      </div>
+      <div class="service-card reveal">
+        <svg class="service-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"/></svg>
+        <h3>Koulutus & Valmistautuminen</h3>
+        <p>Hitsaajien käytännön valmistautuminen pätevyyskokeeseen. Neuvonta oikeasta tekniikasta ja pätevyysalueen optimoinnista ennen koetta.</p>
+        <span class="service-tag">Konsultointi</span>
+      </div>
+      <div class="service-card reveal">
+        <svg class="service-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/></svg>
+        <h3>Asiantuntijaneuvonta</h3>
+        <p>Konsultointi hitsauksen laadunhallintaan, standardien tulkintaan ja direktiivien vaatimusten täyttämiseen. Tehtaille, yrityksille ja rakentajille.</p>
+        <span class="service-tag">B2B</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<div class="testimonials">
+  <div class="testimonials-inner">
+    <div class="section-eyebrow reveal">Asiakkaiden kokemuksia</div>
+    <h2 class="section-title reveal">Mitä Asiakkaat<br>Sanovat</h2>
+    <div class="testimonials-grid">
+      <div class="testi-card reveal">
+        <div class="testi-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="testi-text">Mika auttoi räätälöimään pätevyysalueen niin, että yhdellä kokeella katettiin kaikki tuotantomme hitsausprosessit. Säästettiin aikaa ja rahaa merkittävästi.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">JK</div>
+          <div>
+            <div class="testi-name">Janne Korhonen</div>
+            <div class="testi-role">Tuotantopäällikkö, Metalliteollisuus</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal">
+        <div class="testi-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="testi-text">Nopeaa, ammattitaitoista palvelua. Koe saatiin järjestettyä lyhyellä varoitusajalla ja dokumentaatio oli täydellinen tarkastusta varten. Suosittelemme lämpimästi.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">AV</div>
+          <div>
+            <div class="testi-name">Antti Virtanen</div>
+            <div class="testi-role">Hitsausvastaava, Rakennusyhtiö</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal">
+        <div class="testi-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="testi-text">Selkeä prosessi alusta loppuun. Mika osasi neuvoa juuri oikean koejärjestelyn alumiinirakenteille — pätevyystodistus tuli ilman ylimääräisiä uusintoja.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">MP</div>
+          <div>
+            <div class="testi-name">Mikael Peltonen</div>
+            <div class="testi-role">Hitsaaja, Konepajayrittäjä</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STANDARDS -->
+<section id="standardit">
+  <div class="section-inner">
+    <div class="standards-layout">
+      <div class="reveal">
+        <div class="cert-block">
+          <div class="cert-code">SFS-EN ISO 9606-1</div>
+          <div class="cert-name">Hitsaajan pätevyyskoe — Terästen hitsaus</div>
+          <div class="cert-desc">Kattaa MIG/MAG-, TIG-, puikko- ja jauhekaarihitsauksen teräsrakenteille. Teollisuuden yleisin pätevyysstandardi.</div>
+        </div>
+        <div class="cert-block">
+          <div class="cert-code">SFS-EN ISO 9606-2</div>
+          <div class="cert-name">Hitsaajan pätevyyskoe — Alumiinin hitsaus</div>
+          <div class="cert-desc">Alumiini- ja alumiiniseosrakenteiden hitsaajien pätevöinti. MIG ja TIG -prosessit.</div>
+        </div>
+        <div class="auth-badge">
+          <svg class="auth-badge-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+          <div class="auth-badge-text">
+            <strong>Kiwa Inspecta Oy — Valtuutettu valvoja</strong>
+            Kokeet hyväksytään akkreditoidussa tarkastuslaitosketjussa
+          </div>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="section-eyebrow">Prosessi</div>
+        <h2 class="section-title">Miten Koe<br>Sujuu</h2>
+        <p class="section-sub">Asiantuntijamme auttaa optimoimaan pätevyysalueen jo etukäteen — koe kattaa tuotantosi tarpeet laajasti eikä turhia uusintoja tarvita.</p>
+        <div class="process-steps">
+          <div class="process-step">
+            <div class="step-num">01</div>
+            <div class="step-text"><h4>Pätevyysalueen suunnittelu</h4><p>Käydään läpi tuotantosi vaatimukset ja räätälöidään koe kattamaan ne mahdollisimman laajasti.</p></div>
+          </div>
+          <div class="process-step">
+            <div class="step-num">02</div>
+            <div class="step-text"><h4>Kokeen valvonta</h4><p>Valvoja seuraa hitsauksen suorituksen standardin vaatimusten mukaisesti ja dokumentoi kaiken.</p></div>
+          </div>
+          <div class="process-step">
+            <div class="step-num">03</div>
+            <div class="step-text"><h4>Testaus & arviointi</h4><p>Koekappaleet toimitetaan akkreditoituun laboratorioon ainetta rikkovia tai rikkomattomia testejä varten.</p></div>
+          </div>
+          <div class="process-step">
+            <div class="step-num">04</div>
+            <div class="step-text"><h4>Pätevyystodistus</h4><p>Hyväksytty koe tuottaa hitsaajalle virallisen pätevyystodistuksen, joka on voimassa standardin mukaisesti.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERT -->
+<section id="miksi">
+  <div class="section-inner">
+    <div class="section-eyebrow reveal">Asiantuntija</div>
+    <h2 class="section-title reveal">Ihminen<br>Työn Takana</h2>
+    <div class="why-grid">
+      <div class="why-points reveal">
+        <div class="why-point">
+          <svg class="why-point-icon" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+          <div><h4>Kiwa Inspectan valtuuttama</h4><p>Kokeet hyväksytään virallisessa akkreditointiketjussa. Ei harmaita alueita todistuksen pätevyydessä.</p></div>
+        </div>
+        <div class="why-point">
+          <svg class="why-point-icon" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+          <div><h4>IWE-tasoinen osaaminen</h4><p>Kansainvälinen hitsausinsinööri tuntee standardit läpikotaisin — saat neuvonnan, jota muualta ei saa.</p></div>
+        </div>
+        <div class="why-point">
+          <svg class="why-point-icon" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+          <div><h4>Joustava aikataulutus</h4><p>Koe järjestetään sinulle sopivana ajankohtana — myös lyhyellä varoitusajalla tarvittaessa.</p></div>
+        </div>
+        <div class="why-point">
+          <svg class="why-point-icon" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+          <div><h4>Pätevyysalueen optimointi</h4><p>Asiantuntija auttaa valitsemaan koejärjestelyn, joka kattaa tuotantosi tarpeet yhdellä kerralla.</p></div>
+        </div>
+        <div class="why-point">
+          <svg class="why-point-icon" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+          <div><h4>Koko Suomi</h4><p>Palvelemme yrityksiä ja hitsaajia ympäri Suomen — tullaan sinne, missä sinulle sopii.</p></div>
+        </div>
+      </div>
+
+      <div class="expert-card reveal">
+        <div class="expert-photo-area">
+          <div class="expert-avatar">MM</div>
+          <div class="expert-title-block">
+            <div class="expert-name">Mika Mäenpää</div>
+            <div class="expert-role">IWE · Toimitusjohtaja</div>
+            <div class="expert-contact-mini">
+              <a href="tel:+358449221090">📞 +358 44 922 1090</a>
+              <a href="mailto:mika.maenpaa@cerweld.fi">✉ mika.maenpaa@cerweld.fi</a>
+            </div>
+          </div>
+        </div>
+        <div class="expert-body">
+          <p class="expert-bio">
+            Vuosien käytännön kokemus hitsauksen laadunhallinnasta, koordinoinnista ja standardien soveltamisesta teollisuudessa. Mika on työskennellyt kone- ja metalliteollisuuden parissa koko uransa — hän tietää, mitä tuotanto oikeasti tarvitsee.
+          </p>
+          <div class="expert-personal-quote">
+            <p>Minulle tärkeintä on, että hitsaaja lähtee kokeesta pätevyystodistus kädessä — ei palaamaan uusimaan. Siksi suunnittelemme aina ensin, hitsataan sitten.</p>
+            <cite>— Mika Mäenpää</cite>
+          </div>
+          <div class="credentials">
+            <div class="credential-item">IWE — International Welding Engineer</div>
+            <div class="credential-item">Kiwa Inspecta Oy valtuutus</div>
+            <div class="credential-item">ISO 9606-1 & -2 pätevyysvalvoja</div>
+            <div class="credential-item">Hitsauskoordinaattori (IWE-taso)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="yhteystiedot">
+  <div class="section-inner">
+    <div class="section-eyebrow reveal">Ota yhteyttä</div>
+    <h2 class="section-title reveal">Sovitaan<br>Ajankohta</h2>
+    <div class="contact-layout">
+      <div class="reveal">
+        <div class="contact-item">
+          <svg class="contact-item-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.22 1.2 2 2 0 012.22.02h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+          <div><div class="contact-item-label">Puhelin</div><a href="tel:+358449221090" class="contact-item-value">+358 44 922 1090</a></div>
+        </div>
+        <div class="contact-item">
+          <svg class="contact-item-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+          <div><div class="contact-item-label">Sähköposti</div><a href="mailto:mika.maenpaa@cerweld.fi" class="contact-item-value">mika.maenpaa@cerweld.fi</a></div>
+        </div>
+        <div class="contact-item">
+          <svg class="contact-item-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/></svg>
+          <div><div class="contact-item-label">Verkkosivut</div><span class="contact-item-value">www.cerweld.fi</span></div>
+        </div>
+        <div class="contact-item">
+          <svg class="contact-item-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+          <div><div class="contact-item-label">Palvelualue</div><span class="contact-item-value">Koko Suomi</span></div>
+        </div>
+      </div>
+      <form class="contact-form reveal" onsubmit="handleSubmit(event)">
+        <div class="form-row">
+          <div class="form-group"><label>Nimi</label><input type="text" placeholder="Matti Meikäläinen" required></div>
+          <div class="form-group"><label>Yritys</label><input type="text" placeholder="Yritys Oy"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Puhelin</label><input type="tel" placeholder="+358 40 123 4567"></div>
+          <div class="form-group"><label>Sähköposti</label><input type="email" placeholder="matti@yritys.fi" required></div>
+        </div>
+        <div class="form-group">
+          <label>Palvelu</label>
+          <select>
+            <option value="">Valitse palvelu...</option>
+            <option>Pätevyyskoe — ISO 9606-1 (Teräs)</option>
+            <option>Pätevyyskoe — ISO 9606-2 (Alumiini)</option>
+            <option>Hitsauskoordinointi</option>
+            <option>Hitsaustarkastus</option>
+            <option>WPS-dokumentointi</option>
+            <option>Asiantuntijaneuvonta</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Viesti</label>
+          <textarea placeholder="Kerro tarpeistasi — hitsaajien määrä, aikataulu, sijainti..."></textarea>
+        </div>
+        <button type="submit" class="form-submit">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg>
+          Lähetä yhteydenotto
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <a href="#etusivu" class="footer-logo">Cer<span>W</span>eld</a>
+    <div class="footer-copy">© 2025 Cerweld — Hitsauksen asiantuntijapalvelut. Mika Mäenpää IWE.</div>
+    <div class="footer-links">
+      <a href="#palvelut">Palvelut</a>
+      <a href="#standardit">Standardit</a>
+      <a href="#yhteystiedot">Yhteystiedot</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 70);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(el => io.observe(el));
+
+  // Form
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('.form-submit');
+    btn.innerHTML = '✓ Viesti lähetetty!';
+    btn.style.background = '#2a7a3a';
+    setTimeout(() => {
+      btn.innerHTML = `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg> Lähetä yhteydenotto`;
+      btn.style.background = '';
+      e.target.reset();
+    }, 3000);
+  }
+</script>
+</body>
+</html>
